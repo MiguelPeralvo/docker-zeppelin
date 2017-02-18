@@ -18,11 +18,16 @@ RUN set -ex \
     numpy \
     pandasql \
     scipy \
+    matplotlib \
+    seaborn \
  ' \
  && pip3 install $packages \
  && apt-get purge -y --auto-remove $buildDeps \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends python3-tk 
 
 # Zeppelin
 ENV ZEPPELIN_PORT 8080
@@ -30,6 +35,11 @@ ENV ZEPPELIN_HOME /usr/zeppelin
 ENV ZEPPELIN_CONF_DIR $ZEPPELIN_HOME/conf
 ENV ZEPPELIN_NOTEBOOK_DIR $ZEPPELIN_HOME/notebook
 ENV ZEPPELIN_COMMIT 7f6f739ae396e07de573bea4ef16a388c54e77b8
+ENV ZEPPELIN_JAVA_OPTS "-Dspark.storage.memoryFraction=0.6 -Dspark.executor.memory=4g -Dspark.driver.memory=4g -Dspark.driver.maxResultSize=4g -Dspark.cores.max=4"
+ENV ZEPPELIN_MEM "-Xmx2g"
+ENV SPARK_SUBMIT_OPTIONS "--driver-memory 4g --executor-memory 4g"
+
+
 RUN set -ex \
  && buildDeps=' \
     git \
